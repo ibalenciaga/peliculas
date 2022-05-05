@@ -21,12 +21,13 @@ class Director
     #[ORM\Column(type: 'date')]
     private $fechaNacimiento;
 
-    #[ORM\OneToMany(mappedBy: 'director', targetEntity: Peliculas::class)]
-    private $peliculas;
+    #[ORM\ManyToMany(targetEntity: Peliculas::class, inversedBy: 'director')]
+    private $pelicula;
+
 
     public function __construct()
     {
-        $this->peliculas = new ArrayCollection();
+        $this->pelicula = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -61,16 +62,15 @@ class Director
     /**
      * @return Collection<int, Peliculas>
      */
-    public function getPeliculas(): Collection
+    public function getPelicula(): Collection
     {
-        return $this->peliculas;
+        return $this->pelicula;
     }
 
     public function addPelicula(Peliculas $pelicula): self
     {
-        if (!$this->peliculas->contains($pelicula)) {
-            $this->peliculas[] = $pelicula;
-            $pelicula->setDirector($this);
+        if (!$this->pelicula->contains($pelicula)) {
+            $this->pelicula[] = $pelicula;
         }
 
         return $this;
@@ -78,13 +78,12 @@ class Director
 
     public function removePelicula(Peliculas $pelicula): self
     {
-        if ($this->peliculas->removeElement($pelicula)) {
-            // set the owning side to null (unless already changed)
-            if ($pelicula->getDirector() === $this) {
-                $pelicula->setDirector(null);
-            }
-        }
+        $this->pelicula->removeElement($pelicula);
 
         return $this;
+    }
+
+    public function __toString() {
+        return $this->getNombre();
     }
 }

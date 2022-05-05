@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Actor;
+use App\Entity\Director;
 use App\Entity\Peliculas;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -43,5 +45,7 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Peliculas', 'fas fa-list', Peliculas::class);
+        yield MenuItem::linkToCrud('Actores', 'fas fa-list', Actor::class);
+        yield MenuItem::linkToCrud('Directores', 'fas fa-list', Director::class);
     }
 }

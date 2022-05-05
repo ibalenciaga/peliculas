@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PeliculasRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PeliculasRepository::class)]
@@ -28,11 +30,17 @@ class Peliculas
     #[ORM\Column(type: 'string', length: 50)]
     private $productora;
 
-    #[ORM\ManyToOne(targetEntity: Actor::class, inversedBy: 'peliculas')]
+    #[ORM\ManyToMany(targetEntity: Actor::class, mappedBy: 'pelicula')]
     private $actor;
 
-    #[ORM\ManyToOne(targetEntity: Director::class, inversedBy: 'peliculas')]
+    #[ORM\ManyToMany(targetEntity: Director::class, mappedBy: 'pelicula')]
     private $director;
+
+    public function __construct()
+    {
+        $this->actor = new ArrayCollection();
+        $this->director = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -99,27 +107,62 @@ class Peliculas
         return $this;
     }
 
-    public function getActor(): ?Actor
+    /**
+     * @return Collection<int, Actor>
+     */
+    public function getActor(): Collection
     {
         return $this->actor;
     }
 
-    public function setActor(?Actor $actor): self
+    public function addActor(Actor $actor): self
     {
-        $this->actor = $actor;
+        if (!$this->actor->contains($actor)) {
+            $this->actor[] = $actor;
+            $actor->addPelicula($this);
+        }
 
         return $this;
     }
 
-    public function getDirector(): ?Director
+    public function removeActor(Actor $actor): self
+    {
+        if ($this->actor->removeElement($actor)) {
+            $actor->removePelicula($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Director>
+     */
+    public function getDirector(): Collection
     {
         return $this->director;
     }
 
-    public function setDirector(?Director $director): self
+    public function addDirector(Director $director): self
     {
-        $this->director = $director;
+        if (!$this->director->contains($director)) {
+            $this->director[] = $director;
+            $director->addPelicula($this);
+        }
 
         return $this;
     }
+
+    public function removeDirector(Director $director): self
+    {
+        if ($this->director->removeElement($director)) {
+            $director->removePelicula($this);
+        }
+
+        return $this;
+    }
+
+    public function __toString(){
+        return $this->getTitulo();
+    }
+
 }

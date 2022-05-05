@@ -27,12 +27,12 @@ class Actor
     #[ORM\Column(type: 'string', length: 25)]
     private $lugarNacimiento;
 
-    #[ORM\OneToMany(mappedBy: 'actor', targetEntity: Peliculas::class)]
-    private $peliculas;
+    #[ORM\ManyToMany(targetEntity: Peliculas::class, inversedBy: 'actor')]
+    private $pelicula;
 
     public function __construct()
     {
-        $this->peliculas = new ArrayCollection();
+        $this->pelicula = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -91,16 +91,15 @@ class Actor
     /**
      * @return Collection<int, Peliculas>
      */
-    public function getPeliculas(): Collection
+    public function getPelicula(): Collection
     {
-        return $this->peliculas;
+        return $this->pelicula;
     }
 
     public function addPelicula(Peliculas $pelicula): self
     {
-        if (!$this->peliculas->contains($pelicula)) {
-            $this->peliculas[] = $pelicula;
-            $pelicula->setActor($this);
+        if (!$this->pelicula->contains($pelicula)) {
+            $this->pelicula[] = $pelicula;
         }
 
         return $this;
@@ -108,13 +107,13 @@ class Actor
 
     public function removePelicula(Peliculas $pelicula): self
     {
-        if ($this->peliculas->removeElement($pelicula)) {
-            // set the owning side to null (unless already changed)
-            if ($pelicula->getActor() === $this) {
-                $pelicula->setActor(null);
-            }
-        }
+        $this->pelicula->removeElement($pelicula);
 
         return $this;
     }
+
+    public function __toString(){
+        return $this->getNombre();
+    }
+
 }
